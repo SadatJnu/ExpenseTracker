@@ -1,6 +1,6 @@
 # ExpenseTracker
 This is an Expense Tracker system that can record daily expenditure in
-Step - 1 : Connect your DBName
+Step - 1 : Connect your ServerName &  DBName
 Step - 2 : Update-Database
 Step - 3 : Run the Store Procedure [ 
 USE [ExpenseDB]
