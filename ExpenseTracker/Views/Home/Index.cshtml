@@ -1,0 +1,753 @@
+﻿@model IEnumerable<ExpenseTracker.Models.ExpenseCategories>
+@using ExpenseTracker.Models;
+@{
+    ViewBag.Title = "Expense Category";
+}
+
+<style>
+    fieldset.scheduler-border {
+        border: 1px solid #ccc;
+        padding: 0px 5px 10px 5px;
+        -webkit-box-shadow: 0px 0px 0px 0px #000;
+        box-shadow: 0px 0px 0px 0px #000;
+    }
+
+    legend.scheduler-border {
+        margin-bottom: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        text-align: left;
+        width: auto;
+        padding: 0 0px;
+        border-bottom: none;
+        margin-left: -15px;
+    }
+
+    /*pagination*/
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -moz-appearance: textfield !important;
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .pagination {
+        margin: 0px;
+    }
+
+        .pagination span {
+            padding: 1px 9px;
+            height: 25px;
+            background-color: #dddddd;
+            border: 1px solid #868e96 !important;
+            color: #000;
+        }
+
+    .focusNumber {
+        background-color: #3C8DBC !important;
+        color: #fff;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .activePage {
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .pageNumbers:hover {
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    }
+    /*./pagination*/
+
+    .table tbody > tr > td {
+        vertical-align: middle !important;
+    }
+
+    .table tbody > tr > th {
+        vertical-align: middle !important;
+    }
+
+    .info-box-text {
+        text-transform: uppercase;
+        text-align: center;
+        padding-bottom: 10px;
+        font-size: 18px;
+        color: #000;
+    }
+
+    .info-box-content {
+        padding: 9px 10px;
+        margin-left: 90px;
+    }
+
+    .attendance:hover .info-box-content {
+        background: #f39c12;
+        color: #fff;
+    }
+
+    .attendance:hover .info-box-text {
+        color: #fff;
+    }
+
+    .currenttime ul {
+        padding: 0px;
+        margin: 0px;
+    }
+
+        .currenttime ul li {
+            display: inline;
+        }
+
+    input, select, textarea {
+        height: 31px;
+        width: 100% !important;
+    }
+
+    .checkboxSize {
+        height: 20px;
+        width: 100% !important;
+    }
+
+    th {
+        white-space: nowrap;
+        border: 1px solid #ccc !important;
+    }
+
+        th.trBorder, #ExpenseDataShow td {
+            border: 1px solid #ccc !important;
+        }
+
+    #searchpagenumber {
+        border: 1px solid #868e96 !important;
+    }
+
+    .box {
+        margin-bottom: 0px;
+    }
+
+    @@media(min-width:768px) and (max-width:1280px) {
+        .screensize {
+            width: 100% !important;
+        }
+    }
+</style>
+
+<section class="content-header">
+    <ol class="breadcrumb">
+        <button type="submit" id="btnNewExpense" name="btnNewExpense" class="btn btn-primary" style=" width:210px;float: right;">Add Expense Category</button>
+    </ol>
+</section>
+
+<div id="myModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-left"> Expense Category</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="height:auto;background:content-box;border:none !important;">
+                    <div class="container-fluid">
+                        <div class="row" style="padding-bottom: 10px;margin-right:0px;margin-left:0px;">
+                            <!----============= Form ==================-->
+                            <form id="ExpenseCategories">
+                                <input type="hidden" id="Id" class="form-control" name="Id" autocomplete="off"  />
+                                <div class="form-group">
+                                    <label class="col-md-12 col-xs-12 control-label align-right">Category Name</label>
+                                    <div class="col-md-12 col-xs-12">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><span class="glyphicon glyphicon-info-sign"></span></span>
+                                            <input type="text" id="CategoryName" class="form-control" name="CategoryName" autocomplete="off" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="container-fluid">
+                    <div class="row" style="padding-bottom: 10px;">
+                        <div class="col-md-12 col-xs-12 screensize">
+                            <div id="SaveMood" style="float:right;">
+                                <button type="submit" id="btnSave" name="btnSave" class="btn btn-primary" style="margin-top:10px;">Save</button>
+                                <button type="submit" id="btnCancel" name="btnCancel" class="btn btn-warning" style=" margin-top:10px;">Clear</button>
+
+                                <button type="submit" id="btnUpdate" name="btnUpdate" class="btn btn-primary" style=" display:none;margin-top:10px;">Update</button>
+                                <button type="submit" id="btnClose" name="btnClose" class="btn" data-dismiss="modal" style="margin-top: 10px;">Close</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="row" style="padding-bottom: 10px;margin-right:0px;margin-left:0px;">
+        <div class="col-md-12 col-sm-12 col-xs-12" id="projectData">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title text-center">Expense Category List</h3>                    
+                </div>
+                <table class="table no-margin expense-search-table display table-striped table-condensed table-hover table-responsive display nowrap" id="ExpenseDataShow">
+                    <thead>
+                        <tr style="background: lightgray;" id="headerTR">
+                            <th class="trBorder" style="width:5%">SL</th>
+                            <th class="trBorder" style="width:15%">Category Name</th>
+                            <th class="trBorder text-center" style="width:5%">Modify</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseDataList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="~/lib/jquery/dist/jquery-1.10.2.min.js"></script>
+
+<script>
+
+    let PageSize = 5;
+    let PageNo = 0;
+
+    $(document).ready(function () {
+
+        GetExpenseDataList(PageSize = 5, PageNo = 0);
+
+        $("#btnNewExpense").on('click', function (e) {
+            $('#CategoryName').val('');
+            $('#btnSave').show();
+            $('#btnCancel').show();
+            $('#btnUpdate').hide();
+            $('#myModal').modal('show');
+        });
+
+        $("#btnSave").on('click', function (e) {
+
+            var expense = $("#CategoryName").val().trim();
+
+            if (expense === undefined || expense === null || expense === "") {
+                swal({
+                    allowOutsideClick: false,
+                    title: 'Expense Category Name Required.',
+                    type: 'warning',
+                    showCancelButton: false,
+                    confirmButtonText: 'OK',
+                    reverseButtons: true
+                });
+                $("#CategoryName").focus();
+                changecolor("CategoryName");
+                return;
+            }
+
+            var autoID = $('#Id').val();
+
+            if (autoID !== "") {
+                swal({
+                    allowOutsideClick: false,
+                    title: 'You can not save with same data repeatedly !',
+                    type: 'warning',
+                    showCancelButton: false,
+                    confirmButtonText: 'OK',
+                    reverseButtons: true
+                });
+                return;
+            }
+
+            var submitValue = false;
+
+            var data = $("#ExpenseCategories").serialize();
+
+            if (expense != "") {
+                submitValue = true;
+            }
+
+            if (submitValue == true) {
+
+                swal({
+                    allowOutsideClick: false,
+                    title: 'Do you want to create ?',
+                    type: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    reverseButtons: true
+                }).then(function () {
+                    swal({
+                        title: 'Processing...',
+                        allowOutsideClick: false,
+                        onOpen: function () {
+                            swal.showLoading()
+                        }
+                    });
+                    $.ajax({
+                        type: "POST",
+                        url: "/Home/Add_Update_ExpenseCategory",
+                        data: data,
+                    }).done(function (res) {
+                        if (res.status == "success") {
+                            swal.close();
+                            swal({
+                                allowOutsideClick: false,
+                                title: 'Successful',
+                                type: 'success',
+                                showCancelButton: false,
+                                confirmButtonText: 'Done',
+                                reverseButtons: true
+                            }).then(function () {
+                                $("#Id").val('');
+                                $("#CategoryName").val('');
+                                $('#myModal').modal('hide');
+                                GetExpenseDataList(PageSize = 5, PageNo = 0);
+                            });
+                        }
+                        else if (res.status == "Already Exist!") {
+                            swal.close();
+                            swal({
+                                allowOutsideClick: false,
+                                title: 'Expense Category Name Already Exist!',
+                                type: 'warning',
+                                showCancelButton: false,
+                                confirmButtonText: 'OK',
+                                reverseButtons: true
+                            });
+                        }
+                        else {
+                            swal.close();
+                            swal({
+                                allowOutsideClick: false,
+                                title: res.status,
+                                type: 'error',
+                                showCancelButton: false,
+                                confirmButtonText: 'OK',
+                                reverseButtons: true
+                            });
+                        }
+                    }).fail(function (res) {
+                        swal.close();
+                        swal({
+                            allowOutsideClick: false,
+                            title: 'Failed',
+                            type: 'error',
+                            showCancelButton: false,
+                            confirmButtonText: 'OK',
+                            reverseButtons: true
+                        });
+                    });
+                });
+            };
+        });
+
+        $("#btnUpdate").on('click', function (e) {
+            var expense = $("#CategoryName").val().trim();
+
+            var submitValue = false;
+
+            if (expense === undefined || expense === null || expense === "") {
+                swal({
+                    allowOutsideClick: false,
+                    title: 'Expense Category Name Required.',
+                    type: 'warning',
+                    showCancelButton: false,
+                    confirmButtonText: 'OK',
+                    reverseButtons: true
+                });
+                $("#CategoryName").focus();
+                changecolor("CategoryName");
+                return;
+            }
+
+            var data = $("#ExpenseCategories").serialize();
+
+            if (expense != "") {
+                submitValue = true;
+            }
+
+            if (submitValue == true) {
+
+                swal({
+                    allowOutsideClick: false,
+                    title: 'Do you want to update ?',
+                    type: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    reverseButtons: true
+                }).then(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Home/Add_Update_ExpenseCategory",
+                        data: data,
+                    }).done(function (res) {
+                        if (res.status == "success") {
+                            swal({
+                                allowOutsideClick: false,
+                                title: 'Successful',
+                                type: 'success',
+                                showCancelButton: false,
+                                confirmButtonText: 'Done',
+                                reverseButtons: true
+                            }).then(function () {
+                                $("#Id").val('');
+                                $("#CategoryName").val('');
+                                $('#myModal').modal('hide');
+                                GetExpenseDataList(PageSize = 5, PageNo = 0);
+                            });
+                        }
+                        else {
+                            swal({
+                                allowOutsideClick: false,
+                                title: res.status,
+                                type: 'error',
+                                showCancelButton: false,
+                                confirmButtonText: 'OK',
+                                reverseButtons: true
+                            });
+                        }
+                    }).fail(function (res) {
+                        swal({
+                            allowOutsideClick: false,
+                            title: 'Failed',
+                            type: 'error',
+                            showCancelButton: false,
+                            confirmButtonText: 'OK',
+                            reverseButtons: true
+                        });
+                    });
+                });
+            };
+        });
+
+        $("#btnCancel").on('click', function (e) {
+            $("#Id").val('');
+            $("#CategoryName").val('');
+            $("#btnSave").show();
+            $("#btnCancel").show();
+            $("#btnUpdate").hide();
+        });
+
+        $('body').on('click', '.btnEdit', function (e) {
+
+            var id = e.target.value;
+
+            CategoryNameEdit(id);
+        });
+
+        $('body').on('click', '.btnDelete', function (e) {
+
+            var id = e.target.value;
+
+            ItemDelete(id);
+        });
+
+    });
+
+
+    function CategoryNameEdit(id) {
+        swal({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            onOpen: function () {
+                swal.showLoading()
+            }
+        });
+        $.ajax({
+            type: "GET",
+            url: "/Home/CategoryNameEdit",
+            data: { 'id': id },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                $('#Id').val(result[0].id);
+                $('#CategoryName').val(result[0].categoryName);
+                $("#btnSave").hide();
+                $("#btnCancel").hide();
+                $("#btnUpdate").show();
+                $('#myModal').modal('show');
+                swal.close();
+            },
+            error: function (result) {
+                swal.close();
+                swal({
+                    allowOutsideClick: false,
+                    title: 'Failed',
+                    type: 'error',
+                    showCancelButton: false,
+                    confirmButtonText: 'OK',
+                    reverseButtons: true
+                });
+            }
+        });
+    };
+
+    function ItemDelete(id) {
+
+        var _confirm = confirm("Are you sure you want to delete this ?");
+
+        if (_confirm == true) {
+            swal({
+                title: 'Deleting...',
+                allowOutsideClick: false,
+                onOpen: function () {
+                    swal.showLoading()
+                }
+            });
+
+            var url = '@Url.Action("ExpenseItemDelete", "Home")';
+            $.post(url, {
+                id: id
+            }).done(function (res) {
+                if (res.status == "success") {
+                    swal.close();
+                    swal({
+                        allowOutsideClick: false,
+                        title: 'Delete Successful.',
+                        type: 'success',
+                        showCancelButton: false,
+                        confirmButtonText: 'Done',
+                        reverseButtons: true
+                    }).then(function () {
+                        $("#Id").val('');
+                        $("#CategoryName").val('');
+                        $('#myModal').modal('hide');
+                        GetExpenseDataList(PageSize = 5, PageNo = 0);
+                    });
+                }
+                else if (res.status == "Already Used"){
+                    swal.close();
+                    swal({
+                        allowOutsideClick: false,
+                        title: 'Data already used in Daily expenses.',
+                        type: 'error',
+                        showCancelButton: false,
+                        confirmButtonText: 'OK',
+                        reverseButtons: true
+                    });
+                }
+                else {
+                    swal.close();
+                    swal({
+                        allowOutsideClick: false,
+                        title: res.status,
+                        type: 'error',
+                        showCancelButton: false,
+                        confirmButtonText: 'OK',
+                        reverseButtons: true
+                    });
+                }
+            }).fail(function (res) {
+                swal.close();
+                swal({
+                    allowOutsideClick: false,
+                    title: 'Failed',
+                    type: 'error',
+                    showCancelButton: false,
+                    confirmButtonText: 'OK',
+                    reverseButtons: true
+                });
+            });
+        }
+        _confirm = false;
+    };
+
+    function GetExpenseDataList(PageSize, PageNo) {
+        swal({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            onOpen: function () {
+                swal.showLoading()
+            }
+        });
+        $.ajax({
+            type: "GET",
+            url: "/Home/GetExpenseDataList",
+            data: { 'pageSize': PageSize, 'pageNo': PageNo },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                let rowCount = 0;
+                let htmlData = '';
+                if (!result.length) {
+                    var rows;
+                    rows = '<th>\
+                        <th colspan="3" class="text-center text-danger">' + 'Record not found!' + '</th>\
+                        </th>';
+                    $('#ExpenseDataShow tbody').empty(),
+                        $('#ExpenseDataShow tbody').append(rows);
+                    swal.close();
+                }
+                else {
+                    for (i = 0; i < result.length; i++) {
+                        rowCount = result[0]['totalRow'];
+                        let rowNo = parseInt(PageNo * PageSize) + parseInt(i) + 1;
+                        htmlData +=
+                            '<tr id ="' + result[i]['id'] + '">\
+                            <td>' + rowNo + '</td>\
+                            <td>' + result[i]['categoryName'] + '</td>\
+                            <th style="text-align:center !important;">\ <button type="button" id="' + result[i]['id'] + '" name="btnEdit" value="' + result[i]['id'] + '" class="btn btn-primary btnEdit" style="width:70px;">Edit</button>  <button type="button" id="' + result[i]['id'] + '" name="btnDelete" value="' + result[i]['id'] + '" class="btn btn-danger btnDelete" style="width:70px;">Delete</button>\</th>\
+                             </tr>';
+                    };
+                    $("#expenseDataList").html(htmlData);
+                    TablePagination(rowCount);
+                    swal.close();
+                }
+            },
+            error: function (result) {
+                swal.close();
+                console.log(result);
+            }
+        });
+    };
+
+    function changecolor(id) {
+        $("#" + id).css("border", "1px solid red");
+        setTimeout(function () { $("#" + id).css("border", "1px groove #ddd"); }, 3000)
+    };
+
+    function TablePagination(rowLength) {
+        $('#pages').remove();
+        var totalPages = Math.ceil(rowLength / PageSize);
+        var $pages = $('<div id="pages" class="pagination" style="margin:10px 5px 10px 5px;"></div>');
+        var currentnumrow = 0;
+        var precurrentnumrow = totalPages - 1;
+        var pageendrownum = 0;
+
+        var startnum = 0;
+        var endnum = 0;
+        var generalnum = 0;
+
+        if (PageNo == 0) { startnum = 1; }
+        else
+        {
+            startnum = (PageSize * PageNo) + 1;
+        }
+
+        if (PageNo == 0) {
+            if (rowLength > 0 && rowLength >= PageSize) { endnum = PageSize; }
+            else if (rowLength < PageSize) { endnum = rowLength; }
+        }
+        else {
+            var a = (PageSize * (PageNo + 1));
+            if ((rowLength - a) >= 0) {
+                endnum = a;
+            }
+            else {
+                a = rowLength - (PageSize * PageNo);
+                endnum = a + (startnum - 1);
+            }
+        }
+
+        if (PageNo == 0) {
+            pageendrownum = Math.ceil(1 * PageSize);
+        }
+        else {
+            pageendrownum = Math.ceil(PageNo * PageSize);
+        }
+
+        if (totalPages > 3 && PageNo != 0) {
+            $('<span class="previouspage" style="padding:0px 8px 5px 5px;border:1px solid #ccc;cursor:pointer;"><input type="hidden" id="previouspage" value="' + (PageNo - 1) + '"> PRE</span>').appendTo($pages);
+        }
+
+        for (i = 0; i < totalPages; i++) {
+            if (i == PageNo) {
+                currentnumrow++;
+
+                if (PageNo > 0) {
+                    generalnum = 1;
+                    if (PageNo < (totalPages - 2)) {
+                        if (PageNo > 3 && (PageNo + 1) < totalPages) {
+                            $('<span style="padding:0px 8px 5px 5px;border:1px solid #ccc;">...</span>').appendTo($pages);
+                        }
+
+                        $('<span id="PageNo' + (PageNo) + '" class="pageNumbers activePage" style="padding:0px 8px 5px 5px;border:1px solid #3C8DBC;">&nbsp;' + (PageNo + 1) + '</span>').appendTo($pages);
+                        if ((PageNo + 1) < totalPages) {
+                            $('<span id="PageNo' + (PageNo + 1) + '" class="pageNumbers" style="padding:0px 8px 5px 5px;border:1px solid #ccc;">&nbsp;' + (PageNo + 2) + '</span>').appendTo($pages);
+                            $('<span id="PageNo' + (PageNo + 2) + '" class="pageNumbers" style="padding:0px 8px 5px 5px;border:1px solid #ccc;">&nbsp;' + (PageNo + 3) + '</span>').appendTo($pages);
+                        }
+                    }
+                    else {
+                        $('<span style="padding:0px 8px 5px 5px;border:1px solid #ccc;">...</span>').appendTo($pages);
+                        $('<span id="PageNo' + (PageNo) + '" class="pageNumbers activePage" style="padding:0px 8px 5px 5px;border:1px solid #3C8DBC;">&nbsp;' + (PageNo + 1) + '</span>').appendTo($pages);
+                    }
+                }
+                else {
+                    $('<span id="PageNo' + i + '" class="pageNumbers activePage" style="padding:0px 8px 5px 5px;border:1px solid #3C8DBC;">&nbsp;' + (i + 1) + '</span>').appendTo($pages);
+                }
+            }
+            else {
+                currentnumrow++;
+                if (currentnumrow < 3) {
+                    $('<span id="PageNo' + i + '" class="pageNumbers" style="padding:0px 8px 5px 5px;border:1px solid #ccc;">&nbsp;' + (i + 1) + '</span>').appendTo($pages);
+                }
+                if (currentnumrow == 3 && generalnum == 0) {
+                    $('<span id="PageNo' + i + '" class="pageNumbers" style="padding:0px 8px 5px 5px;border:1px solid #ccc;">&nbsp;' + (i + 1) + '</span>').appendTo($pages);
+                }
+            }
+        }
+
+        if (PageNo < totalPages - 1) {
+            if ((currentnumrow) == totalPages) {
+                $('<span style="padding:0px 8px 5px 5px;border:1px solid #ccc;">...</span>').appendTo($pages);
+            }
+            if ((currentnumrow + 1) != totalPages) {
+                $('<span id="PageNo' + (totalPages - 1) + '" class="pageNumbers" style="padding:0px 8px 5px 5px;border:1px solid #ccc;">&nbsp;' + totalPages + '</span>').appendTo($pages);
+            }
+
+            $('<span  class="nextpage" style="padding:0px 8px 5px 5px;border:1px solid #ccc;cursor:pointer;"><input type="hidden" id="nextpage" value="' + (PageNo + 1) + '"> NEXT</span>').appendTo($pages);
+        }
+
+        $('<span  style="padding:0px 8px 5px 0px;border:1px solid #ccc;"><input type="number" id="searchpagenumber" style="width:40px !important;height:23px;border-block-style:none;" min="1">&nbsp;<span class="searchpagebutton" style="cursor:pointer;">Go</span></span> ').appendTo($pages);
+        $('<span  style="padding:0px 8px 5px 5px;border:1px solid #ccc;">&nbsp;&nbsp;&nbsp;showing <span  style="background:#ccc;padding:0 5px;border-radius:90px;">' + startnum + '-' + endnum + '</span> out of <span  style="background:#ccc;padding:0 5px;border-radius:90px;">' + rowLength + '</span></span>').appendTo($pages);
+        $pages.appendTo('#projectData');
+        $('.pageNumbers').hover(
+        function () {
+            $(this).addClass('focusNumber');
+        },
+        function () {
+            $(this).removeClass('focusNumber');
+        }
+        );
+        $('.pageNumbers').click(
+        function () {
+            let currentPage = parseInt(this.innerText) - 1;
+            PageNo = currentPage;
+                GetExpenseDataList(PageSize, PageNo);
+        }
+        );
+        $('.previouspage').click(
+        function () {
+            let currentPage = parseInt($('#previouspage').val());
+            PageNo = currentPage;
+                GetExpenseDataList(PageSize, PageNo);
+        }
+        );
+        $('.nextpage').click(
+        function () {
+            let currentPage = parseInt($('#nextpage').val());
+            PageNo = currentPage;
+                GetExpenseDataList(PageSize, PageNo);
+        }
+        );
+        $('.searchpagebutton').click(
+        function () {
+            let currentPage = parseInt($('#searchpagenumber').val());
+            if (currentPage == 0) {
+                currentPage = 1;
+            }
+            if (!isNaN(currentPage) && currentPage <= totalPages) {
+                PageNo = currentPage - 1;
+                GetExpenseDataList(PageSize, PageNo);
+            }
+        }
+      );
+
+        if (rowLength <= 5) {
+            $('#pages').hide();
+        }
+    };
+
+</script>
