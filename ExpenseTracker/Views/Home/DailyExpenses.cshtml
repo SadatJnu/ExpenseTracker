@@ -172,7 +172,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title text-left"> Expense Category</h4>
+                <h4 class="modal-title text-left"> Daily Expenses </h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
@@ -206,7 +206,7 @@
                                     <div class="col-md-12 col-xs-12">
                                         <div class="input-group">
                                             <span class="input-group-addon"><span class="glyphicon glyphicon-info-sign"></span></span>
-                                            <input type="text" autocomplete="off" class="form-control" id="ExpenseAmount" name="ExpenseAmount" style="height:32px; width:400px !important;padding:0px !important; ">
+                                    <input type="number" autocomplete="off" class="form-control" id="ExpenseAmount" name="ExpenseAmount" style="height:32px; width:400px !important;padding:0px !important; ">
                                         </div>
                                     </div>
                                 </div>
@@ -851,19 +851,23 @@
     $('#ExpenseAmount').on('keypress', function (event) {
         var getVal = $('#ExpenseAmount').val();
         var val = event.key;
-        if (isNaN(val)) {
-            if (val == '+' || val == '-' || val == 'E' || val == 'e') {
-                getVal = getVal + val.replace("-", "").replace("+", "").replace("E", "").replace("e", "");
-                $('#ExpenseAmount').val(getVal);
-                event.preventDefault();
+        if (val != ".")
+        {
+            if (isNaN(val)) {
+                if (val == '+' || val == '-' || val == 'E' || val == 'e') {
+                    getVal = getVal + val.replace("-", "").replace("+", "").replace("E", "").replace("e", "");
+                    $('#ExpenseAmount').val(getVal);
+                    event.preventDefault();
+                }
+                else {
+                    event.preventDefault();
+                }
             }
-            else {
-                event.preventDefault();
+            else
+            {
+                console.log(val);
             }
-        }
-        else {
-            console.log(val);
-        }
+        }        
     });
 
 
