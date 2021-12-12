@@ -85,6 +85,7 @@ namespace ExpenseTracker.Controllers
                 if (data != null)
                 {
                     data.CategoryName = expCat.CategoryName;
+                    data.UPD_USER_ID = HttpContext.Connection.LocalPort.ToString();
                     data.UPD_DATE = DateTime.Now;
                 }
                 else
@@ -96,6 +97,7 @@ namespace ExpenseTracker.Controllers
 
                         expense.CategoryName = expCat.CategoryName;
                         expense.IsDeleted = false;
+                        expense.REG_USER_ID = HttpContext.Connection.LocalPort.ToString();
                         expense.REG_DATE = DateTime.Now;
                         db.ExpenseCategories.Add(expense);
                     }
@@ -339,6 +341,7 @@ namespace ExpenseTracker.Controllers
                     data.ExpenseCategoryId = dailyExp.ExpenseCategoryId;
                     data.ExpenseDate = dailyExp.ExpenseDate;
                     data.ExpenseAmount = dailyExp.ExpenseAmount;
+                    data.UPD_USER_ID = HttpContext.Connection.LocalPort.ToString();
                     data.UPD_DATE = DateTime.Now;
                 }
                 else
@@ -349,6 +352,7 @@ namespace ExpenseTracker.Controllers
                     expense.ExpenseDate = dailyExp.ExpenseDate;
                     expense.ExpenseAmount = dailyExp.ExpenseAmount;
                     expense.IsDeleted = false;
+                    expense.REG_USER_ID = HttpContext.Connection.LocalPort.ToString();
                     expense.REG_DATE = DateTime.Now;
                     db.DailyExpenses.Add(expense);
                 }
