@@ -1,7 +1,9 @@
 ﻿using AspNetCore.Reporting;
 using ExpenseTracker.Models;
 using ExpenseTracker.ModelView;
+using ExpenseTracker.Service;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -18,12 +20,11 @@ namespace ExpenseTracker.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         DefaultConnection db = new DefaultConnection();
-
-        public HomeController(ILogger<HomeController> logger)
+        private IConfiguration Configuration;
+        public HomeController(IConfiguration _configuration)
         {
-            _logger = logger;
+            Configuration = _configuration;
         }
 
         #region ExpenseDataList
@@ -31,7 +32,7 @@ namespace ExpenseTracker.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-          
+            ConnectionStrings.connString = this.Configuration.GetConnectionString("DefaultConnection");
             return View();
         }
 
@@ -41,19 +42,8 @@ namespace ExpenseTracker.Controllers
             try
             {
                 DataSet DS = new DataSet();
-                string constr = @"Data Source=DESKTOP-VKT0DVC;Initial Catalog=ExpenseDB;Persist Security Info=True;User ID=sa;Password=123;MultipleActiveResultSets=True";
-                using (SqlConnection con = new SqlConnection(constr))
-                {
-                    string query = @"EXEC SP_Get_ExpenseCategory_Data_List  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "' ";
-                    using (SqlCommand cmd = new SqlCommand(query))
-                    {
-                        cmd.Connection = con;
-                        using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
-                        {
-                            sda.Fill(DS);
-                        }
-                    }
-                }
+                DS = SqlHelper.ExecuteDataset(ConnectionStrings.connString, CommandType.Text, @"EXEC SP_Get_ExpenseCategory_Data_List  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "' ");
+                
                 List<ExpenseVM> lst = new List<ExpenseVM>();
 
                 foreach (DataRow dr in DS.Tables[0].Rows)
@@ -126,19 +116,8 @@ namespace ExpenseTracker.Controllers
             try
             {
                 DataSet DS = new DataSet();
-                string constr = @"Data Source=DESKTOP-VKT0DVC;Initial Catalog=ExpenseDB;Persist Security Info=True;User ID=sa;Password=123;MultipleActiveResultSets=True";
-                using (SqlConnection con = new SqlConnection(constr))
-                {
-                    string query = @"SELECT Id,CategoryName FROM ExpenseCategories WHERE  Id =  '" + id + "'";
-                    using (SqlCommand cmd = new SqlCommand(query))
-                    {
-                        cmd.Connection = con;
-                        using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
-                        {
-                            sda.Fill(DS);
-                        }
-                    }
-                }
+                DS = SqlHelper.ExecuteDataset(ConnectionStrings.connString, CommandType.Text, @"SELECT Id,CategoryName FROM ExpenseCategories WHERE  Id =  '" + id + "'");
+
                 List<ExpenseVM> lst = new List<ExpenseVM>();
 
                 foreach (DataRow dr in DS.Tables[0].Rows)
@@ -188,7 +167,7 @@ namespace ExpenseTracker.Controllers
         #endregion
 
         public IActionResult Privacy()
-        {
+        {            
             return View();
         }
 
@@ -205,19 +184,8 @@ namespace ExpenseTracker.Controllers
             try
             {
                 DataSet DS = new DataSet();
-                string constr = @"Data Source=DESKTOP-VKT0DVC;Initial Catalog=ExpenseDB;Persist Security Info=True;User ID=sa;Password=123;MultipleActiveResultSets=True";
-                using (SqlConnection con = new SqlConnection(constr))
-                {
-                    string query = @"SELECT Id,CategoryName FROM ExpenseCategories WHERE  IsDeleted = 0";
-                    using (SqlCommand cmd = new SqlCommand(query))
-                    {
-                        cmd.Connection = con;
-                        using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
-                        {
-                            sda.Fill(DS);
-                        }
-                    }
-                }
+                DS = SqlHelper.ExecuteDataset(ConnectionStrings.connString, CommandType.Text, @"SELECT Id,CategoryName FROM ExpenseCategories WHERE  IsDeleted = 0");
+                
                 List<ExpenseVM> lst = new List<ExpenseVM>();
 
                 foreach (DataRow dr in DS.Tables[0].Rows)
@@ -244,19 +212,8 @@ namespace ExpenseTracker.Controllers
             try
             {
                 DataSet DS = new DataSet();
-                string constr = @"Data Source=DESKTOP-VKT0DVC;Initial Catalog=ExpenseDB;Persist Security Info=True;User ID=sa;Password=123;MultipleActiveResultSets=True";
-                using (SqlConnection con = new SqlConnection(constr))
-                {
-                    string query = @"EXEC SP_Get_DailyExpense_Data_List  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "' ";
-                    using (SqlCommand cmd = new SqlCommand(query))
-                    {
-                        cmd.Connection = con;
-                        using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
-                        {
-                            sda.Fill(DS);
-                        }
-                    }
-                }
+                DS = SqlHelper.ExecuteDataset(ConnectionStrings.connString, CommandType.Text, @"EXEC SP_Get_DailyExpense_Data_List  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "' ");
+
                 List<ExpenseVM> lst = new List<ExpenseVM>();
 
                 foreach (DataRow dr in DS.Tables[0].Rows)
@@ -287,19 +244,8 @@ namespace ExpenseTracker.Controllers
             try
             {
                 DataSet DS = new DataSet();
-                string constr = @"Data Source=DESKTOP-VKT0DVC;Initial Catalog=ExpenseDB;Persist Security Info=True;User ID=sa;Password=123;MultipleActiveResultSets=True";
-                using (SqlConnection con = new SqlConnection(constr))
-                {
-                    string query = @"EXEC SP_FilteringExpenseData  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "',@FromDate = '" + Convert.ToDateTime(FromDate).ToString("ddMMyyyy") + "', @ToDate = '" + Convert.ToDateTime(ToDate).ToString("ddMMyyyy") + "' ";
-                    using (SqlCommand cmd = new SqlCommand(query))
-                    {
-                        cmd.Connection = con;
-                        using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
-                        {
-                            sda.Fill(DS);
-                        }
-                    }
-                }
+                DS = SqlHelper.ExecuteDataset(ConnectionStrings.connString, CommandType.Text, @"EXEC SP_FilteringExpenseData  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "',@FromDate = '" + Convert.ToDateTime(FromDate).ToString("ddMMyyyy") + "', @ToDate = '" + Convert.ToDateTime(ToDate).ToString("ddMMyyyy") + "' ");
+
                 List<ExpenseVM> lst = new List<ExpenseVM>();
 
                 foreach (DataRow dr in DS.Tables[0].Rows)
@@ -376,19 +322,8 @@ namespace ExpenseTracker.Controllers
             try
             {
                 DataSet DS = new DataSet();
-                string constr = @"Data Source=DESKTOP-VKT0DVC;Initial Catalog=ExpenseDB;Persist Security Info=True;User ID=sa;Password=123;MultipleActiveResultSets=True";
-                using (SqlConnection con = new SqlConnection(constr))
-                {
-                 string query = @"SELECT Id,ExpenseCategoryId,FORMAT(ExpenseDate,'yyyy-MM-dd')ExpenseDate,ExpenseAmount FROM DailyExpenses WHERE  Id =  '" + id + "'";
-                 using (SqlCommand cmd = new SqlCommand(query))
-                 {
-                     cmd.Connection = con;
-                     using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
-                     {
-                         sda.Fill(DS);
-                     }
-                 }
-               }
+                DS = SqlHelper.ExecuteDataset(ConnectionStrings.connString, CommandType.Text, @"SELECT Id,ExpenseCategoryId,FORMAT(ExpenseDate,'yyyy-MM-dd')ExpenseDate,ExpenseAmount FROM DailyExpenses WHERE  Id =  '" + id + "'");
+
                 List<ExpenseVM> lst = new List<ExpenseVM>();
 
                 foreach (DataRow dr in DS.Tables[0].Rows)

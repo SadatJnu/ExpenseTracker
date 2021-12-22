@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Web.Script.Serialization;
 using System.IO;
+using ExpenseTracker.Service;
 
 namespace ExpenseTracker.Controllers
 {
@@ -44,19 +45,7 @@ namespace ExpenseTracker.Controllers
                 LocalReport report = new LocalReport(rdlcFilePath);
 
                 DataTable dt = new DataTable();
-                string constr = @"Data Source=DESKTOP-VKT0DVC;Initial Catalog=ExpenseDB;Persist Security Info=True;User ID=sa;Password=123;MultipleActiveResultSets=True";
-                using (SqlConnection con = new SqlConnection(constr))
-                {
-                    string query = @"EXEC SP_Get_DailyExpense_Data_List  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "' ";
-                    using (SqlCommand cmd = new SqlCommand(query))
-                    {
-                        cmd.Connection = con;
-                        using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
-                        {
-                            sda.Fill(dt);
-                        }
-                    }
-                }
+                dt = SqlHelper.ExecuteDataTable(ConnectionStrings.connString, CommandType.Text, @"EXEC SP_Get_DailyExpense_Data_List  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "' "); 
 
                 report.AddDataSource("SPResults", dt);
                 parameters.Add("@ReportName", "Daily Expenses List");

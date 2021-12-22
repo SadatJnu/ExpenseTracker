@@ -34,7 +34,7 @@
           <DataField>ExpenseAmount</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-	  <Field Name="ReportName">
+        <Field Name="ReportName">
           <DataField>ReportName</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
