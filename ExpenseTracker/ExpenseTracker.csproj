@@ -20,4 +20,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="RDLC\DailyExpenses.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

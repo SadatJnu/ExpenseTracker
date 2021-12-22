@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Web.Script.Serialization;
+using System.IO;
 
 namespace ExpenseTracker.Controllers
 {
@@ -32,10 +33,14 @@ namespace ExpenseTracker.Controllers
             {
                 string fileDirPath = Assembly.GetExecutingAssembly().Location.Replace("ExpenseTracker.dll", string.Empty);
                 string rdlcFilePath = string.Format("{0}ReportFiles\\{1}.rdlc", fileDirPath, reportName);
+                Directory.CreateDirectory(fileDirPath + "\\ReportFiles");
                 Dictionary<string, string> parameters = new Dictionary<string, string>();
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                Encoding.GetEncoding("windows-1252");
-                //rdlcFilePath = System.IO.Path.Combine("~/RDLC/DailyExpenses.rdlc");
+                Encoding.GetEncoding("windows-1252");                
+                if (!System.IO.File.Exists(rdlcFilePath))
+                {
+                    System.IO.File.Create(rdlcFilePath);
+                }
                 LocalReport report = new LocalReport(rdlcFilePath);
 
                 DataTable dt = new DataTable();
@@ -53,12 +58,6 @@ namespace ExpenseTracker.Controllers
                     }
                 }
 
-                //report.LoadReportDefinition(rdlcFilePath);
-                //report.DataSources.Add(new ReportDataSource("SPResults", dt));
-                //report.SetParameters(new[] { new ReportParameter("ReportName", "Daily Expenses List") });
-                //var pdf = report.Render("PDF");
-                //return File(pdf, "application/pdf", "DailyExpensesList.pdf");
-
                 report.AddDataSource("SPResults", dt);
                 parameters.Add("@ReportName", "Daily Expenses List");
                 var result = report.Execute(GetRenderType(reportType), 1, parameters);
@@ -66,7 +65,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
