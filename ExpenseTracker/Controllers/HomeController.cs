@@ -1,4 +1,5 @@
-﻿using ExpenseTracker.Models;
+﻿using AspNetCore.Reporting;
+using ExpenseTracker.Models;
 using ExpenseTracker.ModelView;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,8 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 
@@ -431,7 +434,7 @@ namespace ExpenseTracker.Controllers
             }
         }
 
-        #endregion
+        #endregion              
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

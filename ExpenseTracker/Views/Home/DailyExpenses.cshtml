@@ -134,9 +134,16 @@
 </style>
 
 <section class="content-header">
-    <ol class="breadcrumb">
-        <button type="submit" id="btnNewExpense" name="btnNewExpense" class="btn btn-primary" style=" width:210px;float: right;">Add Daily Expenses</button>
-    </ol>
+    <div class="breadcrumb">
+        <div class="row col-md-12">
+            <div class="col-md-6">
+                <button type="submit" id="btnNewExpense" name="btnNewExpense" class="btn btn-primary pull-left" style=" width:210px;">Add Daily Expenses</button>
+            </div>
+            <div class="col-md-6">
+                <button type="submit" id="btnReport" name="btnReport" class="btn btn-primary pull-right" style=" width:100px;float: right;">Report</button>
+            </div>
+        </div>        
+    </div>
 </section>
 
 <div class="row" style="padding-bottom: 10px;">
@@ -271,7 +278,7 @@
 
         GetExpenseDataList(PageSize = 5, PageNo = 0);
         GetCategoryNameList();
-        
+
         function GetCategoryNameList() {
             $.ajax({
                 type: "GET",
@@ -306,6 +313,48 @@
             $('#btnUpdate').hide();
             $('#myModal').modal('show');
         });
+
+        $("#btnReport").on('click', function (e) {
+            swal({
+                title: 'Processing...',
+                allowOutsideClick: false,
+                onOpen: function () {
+                    swal.showLoading()
+                }
+            });
+
+            var Url = "@Url.Action("DownloadDailyExpensesData", "Report")";
+
+            $.ajax({
+                type: "GET",
+                url: "/Report/DownloadDailyExpensesData",
+                data: { 'reportType': 'pdf','pageSize': PageSize, 'pageNo': PageNo },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    swal.close();
+                    swal({
+                        allowOutsideClick: false,
+                        title: 'Successful',
+                        type: 'success',
+                        showCancelButton: false,
+                        confirmButtonText: 'OK',
+                        reverseButtons: true
+                    });
+                },
+                error: function (result) {
+                    swal.close();
+                    swal({
+                        allowOutsideClick: false,
+                        title: 'Failed',
+                        type: 'error',
+                        showCancelButton: false,
+                        confirmButtonText: 'OK',
+                        reverseButtons: true
+                    });
+                }
+            });
+        });
+
 
         $("#btnSave").on('click', function (e) {
 
@@ -867,7 +916,7 @@
             {
                 console.log(val);
             }
-        }        
+        }
     });
 
 
