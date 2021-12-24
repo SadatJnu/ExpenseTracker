@@ -20,12 +20,27 @@ namespace ExpenseTracker.Controllers
 {
     public class ReportController : Controller
     {
+        private readonly ILogger<ReportController> _logger;
+
+        public ReportController(ILogger<ReportController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet]
         public IActionResult DownloadDailyExpensesData(string reportType, string pageSize, string pageNo)
         {
-            string reportName = "DailyExpenses";            
-            var returnString = GenerateReportAsync(reportType,reportName, pageSize, pageNo);
-            return File(returnString, System.Net.Mime.MediaTypeNames.Application.Octet, reportName + ".pdf");
+            try
+            {
+                string reportName = "DailyExpenses";
+                var returnString = GenerateReportAsync(reportType, reportName, pageSize, pageNo);
+                return File(returnString, System.Net.Mime.MediaTypeNames.Application.Octet, reportName + ".pdf");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
         }
 
         public byte[] GenerateReportAsync(string reportType, string reportName, string pageSize, string pageNo)
@@ -54,28 +69,37 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
-                throw ex;
+                _logger.LogError(ex.Message);
+                throw;
             }
         }
 
         private RenderType GetRenderType(string reportType)
         {
-            var renderType = RenderType.Pdf;
-            switch (reportType.ToLower())
+            try
             {
-                default:
-                case "pdf":
-                    renderType = RenderType.Pdf;
-                    break;
-                case "word":
-                    renderType = RenderType.Word;
-                    break;
-                case "excel":
-                    renderType = RenderType.Excel;
-                    break;
-            }
+                var renderType = RenderType.Pdf;
+                switch (reportType.ToLower())
+                {
+                    default:
+                    case "pdf":
+                        renderType = RenderType.Pdf;
+                        break;
+                    case "word":
+                        renderType = RenderType.Word;
+                        break;
+                    case "excel":
+                        renderType = RenderType.Excel;
+                        break;
+                }
 
-            return renderType;
+                return renderType;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
         }
 
     }

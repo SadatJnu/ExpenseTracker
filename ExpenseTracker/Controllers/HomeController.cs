@@ -22,17 +22,20 @@ namespace ExpenseTracker.Controllers
     {
         DefaultConnection db = new DefaultConnection();
         private IConfiguration Configuration;
-        public HomeController(IConfiguration _configuration)
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(IConfiguration _configuration, ILogger<HomeController> logger)
         {
             Configuration = _configuration;
+            _logger = logger;
+            ConnectionStrings.connString = this.Configuration.GetConnectionString("DefaultConnection");
         }
 
         #region ExpenseDataList
 
         [HttpGet]
         public IActionResult Index()
-        {
-            ConnectionStrings.connString = this.Configuration.GetConnectionString("DefaultConnection");
+        {            
             return View();
         }
 
@@ -62,6 +65,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return Json(new { Status = "ERROR", ex.Message });
             }
         }
@@ -106,6 +110,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return Json(new { Status = ex.Message });
             }
         }
@@ -133,6 +138,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return View(ex.Message);
             }
         }
@@ -161,6 +167,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return Json(new { Status = ex.Message });
             }
         }
@@ -202,6 +209,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return Json(new { Status = "ERROR", ex.Message });
             }
         }
@@ -234,6 +242,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return Json(new { Status = "ERROR", ex.Message });
             }
         }
@@ -266,6 +275,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return Json(new { Status = "ERROR", ex.Message });
             }
         }
@@ -312,6 +322,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return Json(new { Status = ex.Message });
             }
         }
@@ -341,6 +352,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return View(ex.Message);
             }
         }
@@ -365,6 +377,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return Json(new { Status = ex.Message });
             }
         }
