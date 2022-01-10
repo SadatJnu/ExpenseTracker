@@ -17,6 +17,8 @@ using System.IO;
 using ExpenseTracker.Service;
 using Microsoft.AspNetCore.Authorization;
 using System.Drawing;
+using ZXing;
+using ZXing.QrCode;
 
 namespace ExpenseTracker.Controllers
 {
@@ -85,8 +87,8 @@ namespace ExpenseTracker.Controllers
 
                 string reportName = "DailyExpenses";
                 string fileDirPath = Assembly.GetExecutingAssembly().Location.Replace("ExpenseTracker.dll", string.Empty);
-                string rdlcFilePath = string.Format("{0}ReportFiles\\{1}.rdlc", fileDirPath, reportName);
-                Directory.CreateDirectory(fileDirPath + "\\ReportFiles");
+                string rdlcFilePath = string.Format("{0}RDLC\\{1}.rdlc", fileDirPath, reportName);
+                //Directory.CreateDirectory(fileDirPath + "\\ReportFiles");
                 Dictionary<string, string> parameters = new Dictionary<string, string>();
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                 Encoding.GetEncoding("windows-1252");
@@ -112,12 +114,13 @@ namespace ExpenseTracker.Controllers
 
         private FileContentResult FileRenderType(string reportType, LocalReport localReport, string reportName)
         {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
             var renderType = "";
             string FileName = "";
             byte[] mainStrem = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
             if (reportType == "pdf")
             {
-                var result = localReport.Execute(RenderType.Pdf);
+                var result = localReport.Execute(GetRenderType(reportType), 1, parameters);
                 mainStrem = result.MainStream;
                 renderType = "application/pdf";
             }
@@ -147,8 +150,8 @@ namespace ExpenseTracker.Controllers
 
         //private byte[] GetBarCode(string Content)
         //{
-        //    var qr = new BarcodeWriter();
-        //    qr.Options = new QrCodeEncodingOptions
+        //    var br = new BarcodeWriter();
+        //    br.Options = new QrCodeEncodingOptions
         //    {
         //        DisableECI = true,
         //        CharacterSet = "UTF-8",
@@ -156,11 +159,11 @@ namespace ExpenseTracker.Controllers
         //        Height = 500,
         //        PureBarcode = false
         //    };
-        //    qr.Format = BarcodeFormat.CODE_128;
+        //    br.Format = BarcodeFormat.CODE_128;
 
         //    using (MemoryStream ms = new MemoryStream())
         //    {
-        //        using (Bitmap bm1 = new Bitmap(qr.Write(Content)))
+        //        using (Bitmap bm1 = new Bitmap(br.Write(Content)))
         //        {
         //            bm1.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
         //            return ms.ToArray();
