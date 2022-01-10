@@ -15,9 +15,12 @@ using System.Text;
 using System.Web.Script.Serialization;
 using System.IO;
 using ExpenseTracker.Service;
+using Microsoft.AspNetCore.Authorization;
+using System.Drawing;
 
 namespace ExpenseTracker.Controllers
 {
+    [AllowAnonymous]
     public class ReportController : Controller
     {
         private readonly ILogger<ReportController> _logger;
@@ -28,7 +31,7 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpGet]
-        public IActionResult DownloadDailyExpensesData(string reportType, string pageSize, string pageNo)
+        public IActionResult DownloadDailyExpensesData_BKP(string reportType, string pageSize, string pageNo)
         {
             try
             {
@@ -38,7 +41,7 @@ namespace ExpenseTracker.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex.Message);                
                 throw;
             }
         }
@@ -52,7 +55,7 @@ namespace ExpenseTracker.Controllers
                 Directory.CreateDirectory(fileDirPath + "\\ReportFiles");
                 Dictionary<string, string> parameters = new Dictionary<string, string>();
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                Encoding.GetEncoding("windows-1252");                
+                Encoding.GetEncoding("windows-1252");
                 if (!System.IO.File.Exists(rdlcFilePath))
                 {
                     System.IO.File.Create(rdlcFilePath);
@@ -60,10 +63,10 @@ namespace ExpenseTracker.Controllers
                 LocalReport report = new LocalReport(rdlcFilePath);
 
                 DataTable dt = new DataTable();
-                dt = SqlHelper.ExecuteDataTable(ConnectionStrings.connString, CommandType.Text, @"EXEC SP_Get_DailyExpense_Data_List  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "' "); 
+                dt = SqlHelper.ExecuteDataTable(ConnectionStrings.connString, CommandType.Text, @"EXEC SP_Get_DailyExpense_Data_List  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "' ");
 
                 report.AddDataSource("SPResults", dt);
-                parameters.Add("@ReportName", "Daily Expenses List");
+                //parameters.Add("@ReportName", "Daily Expenses List");
                 var result = report.Execute(GetRenderType(reportType), 1, parameters);
                 return result.MainStream;
             }
@@ -73,6 +76,97 @@ namespace ExpenseTracker.Controllers
                 throw;
             }
         }
+
+        public async Task<IActionResult> DownloadDailyExpensesData(string reportType, string pageSize, string pageNo)
+        {
+            try
+            {
+                //var BarCode = GetBarCode(reportType);
+
+                string reportName = "DailyExpenses";
+                string fileDirPath = Assembly.GetExecutingAssembly().Location.Replace("ExpenseTracker.dll", string.Empty);
+                string rdlcFilePath = string.Format("{0}ReportFiles\\{1}.rdlc", fileDirPath, reportName);
+                Directory.CreateDirectory(fileDirPath + "\\ReportFiles");
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                Encoding.GetEncoding("windows-1252");
+                if (!System.IO.File.Exists(rdlcFilePath))
+                {
+                    System.IO.File.Create(rdlcFilePath);
+                }
+
+                LocalReport report = new LocalReport(rdlcFilePath);
+
+                DataTable dt = new DataTable();
+                dt = SqlHelper.ExecuteDataTable(ConnectionStrings.connString, CommandType.Text, @"EXEC SP_Get_DailyExpense_Data_List  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "' ");
+
+                report.AddDataSource("SPResults", dt);
+                return FileRenderType(reportType, report, reportName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+
+        private FileContentResult FileRenderType(string reportType, LocalReport localReport, string reportName)
+        {
+            var renderType = "";
+            string FileName = "";
+            byte[] mainStrem = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+            if (reportType == "pdf")
+            {
+                var result = localReport.Execute(RenderType.Pdf);
+                mainStrem = result.MainStream;
+                renderType = "application/pdf";
+            }
+            if (reportType == "excel")
+            {
+                var result = localReport.Execute(RenderType.Excel);
+                mainStrem = result.MainStream;
+                renderType = "application/vnd.ms-excel";
+            }
+            if (reportType == "word")
+            {
+                var result = localReport.Execute(RenderType.Word);
+                mainStrem = result.MainStream;
+                if (!String.IsNullOrEmpty(reportName))
+                {
+                    FileName = reportName + ".doc";
+                }
+                else
+                {
+                    FileName = $"Reports_{DateTime.Now.ToString("dd-MMMM-yyyy")}.doc";
+                }
+                renderType = "application/vnd.ms-word";
+            }            
+
+            return File(mainStrem, renderType, FileName);
+        }
+
+        //private byte[] GetBarCode(string Content)
+        //{
+        //    var qr = new BarcodeWriter();
+        //    qr.Options = new QrCodeEncodingOptions
+        //    {
+        //        DisableECI = true,
+        //        CharacterSet = "UTF-8",
+        //        Width = 230,
+        //        Height = 500,
+        //        PureBarcode = false
+        //    };
+        //    qr.Format = BarcodeFormat.CODE_128;
+
+        //    using (MemoryStream ms = new MemoryStream())
+        //    {
+        //        using (Bitmap bm1 = new Bitmap(qr.Write(Content)))
+        //        {
+        //            bm1.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+        //            return ms.ToArray();
+        //        }
+        //    }
+        //}
 
         private RenderType GetRenderType(string reportType)
         {
@@ -101,6 +195,8 @@ namespace ExpenseTracker.Controllers
                 throw;
             }
         }
+
+
 
     }
 }

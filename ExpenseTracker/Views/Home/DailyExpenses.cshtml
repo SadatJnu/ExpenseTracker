@@ -757,15 +757,28 @@
             data: { 'id': id },
             contentType: "application/json; charset=utf-8",
             success: function (result) {
-                $('#Id').val(result[0].id);
-                $('#ExpenseCategoryId').val(result[0].expenseCategoryId);
-                $('#ExpenseDate').val(result[0].expenseDate);
-                $('#ExpenseAmount').val(result[0].expenseAmount);
-                $("#btnSave").hide();
-                $("#btnCancel").hide();
-                $("#btnUpdate").show();
-                $('#myModal').modal('show');
-                swal.close();
+                if (!result.length) {
+                    swal.close();
+                    swal({
+                        allowOutsideClick: false,
+                        title: result.status,
+                        type: 'info',
+                        showCancelButton: false,
+                        confirmButtonText: 'OK',
+                        reverseButtons: true
+                    });
+                }
+                else {
+                    $('#Id').val(result[0].id);
+                    $('#ExpenseCategoryId').val(result[0].expenseCategoryId);
+                    $('#ExpenseDate').val(result[0].expenseDate);
+                    $('#ExpenseAmount').val(result[0].expenseAmount);
+                    $("#btnSave").hide();
+                    $("#btnCancel").hide();
+                    $("#btnUpdate").show();
+                    $('#myModal').modal('show');
+                    swal.close();
+                }               
             },
             error: function (result) {
                 swal.close();

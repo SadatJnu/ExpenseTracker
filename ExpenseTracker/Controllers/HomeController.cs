@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -46,7 +47,7 @@ namespace ExpenseTracker.Controllers
             {
                 DataSet DS = new DataSet();
                 DS = SqlHelper.ExecuteDataset(ConnectionStrings.connString, CommandType.Text, @"EXEC SP_Get_ExpenseCategory_Data_List  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "' ");
-                
+
                 List<ExpenseVM> lst = new List<ExpenseVM>();
 
                 foreach (DataRow dr in DS.Tables[0].Rows)
@@ -120,20 +121,26 @@ namespace ExpenseTracker.Controllers
         {
             try
             {
-                DataSet DS = new DataSet();
-                DS = SqlHelper.ExecuteDataset(ConnectionStrings.connString, CommandType.Text, @"SELECT Id,CategoryName FROM ExpenseCategories WHERE  Id =  '" + id + "'");
-
                 List<ExpenseVM> lst = new List<ExpenseVM>();
 
-                foreach (DataRow dr in DS.Tables[0].Rows)
+                var result = db.ExpenseCategories.Where(x => x.Id == id && x.IsDeleted == false).ToList();
+                if(result.Count > 0)
                 {
-                    lst.Add(
-                    new ExpenseVM
+                    foreach (var item in result)
                     {
-                        Id = Convert.ToInt32(dr["Id"]),
-                        CategoryName = dr["CategoryName"].ToString(),
-                    });
-                }               
+                        lst.Add(
+                        new ExpenseVM
+                        {
+                            Id = Convert.ToInt32(item.Id),
+                            CategoryName = item.CategoryName,
+                        });
+                    }
+                }
+                else
+                {
+                    return Json(new { Status = "Record Not Found!" });
+                }
+                
                 return Json(lst);
             }
             catch (Exception ex)
@@ -190,21 +197,26 @@ namespace ExpenseTracker.Controllers
         {
             try
             {
-                DataSet DS = new DataSet();
-                DS = SqlHelper.ExecuteDataset(ConnectionStrings.connString, CommandType.Text, @"SELECT Id,CategoryName FROM ExpenseCategories WHERE  IsDeleted = 0");
-                
                 List<ExpenseVM> lst = new List<ExpenseVM>();
 
-                foreach (DataRow dr in DS.Tables[0].Rows)
+                var result = db.ExpenseCategories.Where(x => x.IsDeleted == false).ToList();
+                if (result.Count > 0)
                 {
-                    lst.Add(
-                    new ExpenseVM
+                    foreach (var item in result)
                     {
-                        Id = Convert.ToInt32(dr["Id"]),
-                        CategoryName = dr["CategoryName"].ToString(),
-                    });
+                        lst.Add(
+                        new ExpenseVM
+                        {
+                            Id = Convert.ToInt32(item.Id),
+                            CategoryName = item.CategoryName,
+                        });
+                    }
                 }
-
+                else
+                {
+                    return Json(new { Status = "Record Not Found!" });
+                }
+                
                 return Json(lst);
             }
             catch (Exception ex)
@@ -221,6 +233,12 @@ namespace ExpenseTracker.Controllers
             {
                 DataSet DS = new DataSet();
                 DS = SqlHelper.ExecuteDataset(ConnectionStrings.connString, CommandType.Text, @"EXEC SP_Get_DailyExpense_Data_List  @PageSize = '" + pageSize + "', @PageNo = '" + pageNo + "' ");
+
+                var joinQuery = from DE in db.DailyExpenses
+                                join EC in db.ExpenseCategories on DE.ExpenseCategoryId equals EC.Id
+                                select new { Id = DE.Id, ExpenseCategoryId = DE.ExpenseCategoryId, CategoryName = EC.CategoryName, ExpenseAmount = DE.ExpenseAmount, ExpenseDate = DE.ExpenseDate };
+
+                var result = joinQuery.ToList();
 
                 List<ExpenseVM> lst = new List<ExpenseVM>();
 
@@ -332,22 +350,30 @@ namespace ExpenseTracker.Controllers
         {
             try
             {
-                DataSet DS = new DataSet();
-                DS = SqlHelper.ExecuteDataset(ConnectionStrings.connString, CommandType.Text, @"SELECT Id,ExpenseCategoryId,FORMAT(ExpenseDate,'yyyy-MM-dd')ExpenseDate,ExpenseAmount FROM DailyExpenses WHERE  Id =  '" + id + "'");
-
                 List<ExpenseVM> lst = new List<ExpenseVM>();
 
-                foreach (DataRow dr in DS.Tables[0].Rows)
+                var result = db.DailyExpenses.Where(x => x.Id == id && x.IsDeleted == false).ToList();
+                if (result.Count > 0)
                 {
-                    lst.Add(
-                    new ExpenseVM
+                    foreach (var item in result)
                     {
-                        Id = Convert.ToInt32(dr["Id"]),
-                        ExpenseCategoryId = Convert.ToInt32(dr["ExpenseCategoryId"]),
-                        ExpenseDate = dr["ExpenseDate"].ToString(),
-                        ExpenseAmount = dr["ExpenseAmount"].ToString(),
-                    });
+                        DateTime dt = Convert.ToDateTime(item.ExpenseDate.ToString());
+
+                        lst.Add(
+                        new ExpenseVM
+                        {
+                            Id = Convert.ToInt32(item.Id),
+                            ExpenseCategoryId = Convert.ToInt32(item.ExpenseCategoryId),
+                            ExpenseDate = dt.ToString("yyyy-MM-dd"),
+                            ExpenseAmount = item.ExpenseAmount.ToString(),
+                        });
+                    }
                 }
+                else
+                {
+                    return Json(new { Status = "Record Not Found!" });
+                }
+
                 return Json(lst);
             }
             catch (Exception ex)
@@ -388,6 +414,6 @@ namespace ExpenseTracker.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        }        
     }
 }

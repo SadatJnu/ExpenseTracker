@@ -31,7 +31,7 @@ namespace ExpenseTracker
         /// SHP : Make command timeout work
         /// </summary>
         /// <param name="command"></param>
-        
+
         public static void UpdateCommandTimeout(SqlCommand command)
         {
             if (command != null)
@@ -66,7 +66,7 @@ namespace ExpenseTracker
         /// </summary>
         /// <param name="command">The command to which the parameters will be added</param>
         /// <param name="commandParameters">An array of SqlParameters to be added to command</param>
-        
+
 
         private static void AttachParameters(SqlCommand command, SqlParameter[] commandParameters)
         {
@@ -2815,7 +2815,7 @@ namespace ExpenseTracker
         #endregion
 
 
-        
+
 
     }
 
@@ -3032,7 +3032,7 @@ namespace ExpenseTracker
 
         #endregion Parameter Discovery Functions
     }
-    
+
 
 }
 
