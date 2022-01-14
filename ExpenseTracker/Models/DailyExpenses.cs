@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ExpenseTracker.Models
+namespace ExpenseTracker
 {
     [Table("DailyExpenses")]
     public partial class DailyExpenses : BaseEntity

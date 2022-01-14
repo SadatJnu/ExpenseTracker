@@ -1,7 +1,7 @@
 ﻿using AspNetCore.Reporting;
 using ExpenseTracker.Models;
-using ExpenseTracker.ModelView;
 using ExpenseTracker.Service;
+using ExpenseTracker.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

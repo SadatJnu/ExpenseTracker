@@ -1,6 +1,6 @@
 using System;
 
-namespace ExpenseTracker.Models
+namespace ExpenseTracker
 {
     public class ErrorViewModel
     {

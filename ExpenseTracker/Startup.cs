@@ -1,5 +1,4 @@
 using ExpenseTracker.Models;
-using ExpenseTracker.DAL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;

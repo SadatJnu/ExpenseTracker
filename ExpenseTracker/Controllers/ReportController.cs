@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AspNetCore.Reporting;
 using ExpenseTracker.Models;
-using ExpenseTracker.ModelView;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using System.Data.SqlClient;
@@ -120,7 +119,8 @@ namespace ExpenseTracker.Controllers
             byte[] mainStrem = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
             if (reportType == "pdf")
             {
-                var result = localReport.Execute(GetRenderType(reportType), 1, parameters);
+                //var result = localReport.Execute(GetRenderType(reportType), 1, parameters);
+                var result = localReport.Execute(RenderType.Pdf);
                 mainStrem = result.MainStream;
                 renderType = "application/pdf";
             }

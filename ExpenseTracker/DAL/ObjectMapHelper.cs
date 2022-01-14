@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web;
 
-namespace ExpenseTracker.DAL
+namespace ExpenseTracker.Models
 {
     public class ObjectMapHelper<T> where T : new()
     {
