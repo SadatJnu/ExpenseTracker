@@ -15,7 +15,7 @@ namespace ExpenseTracker.Models
         }
 
         public DefaultConnection()
-            : base("Data Source=DESKTOP-VKT0DVC;Initial Catalog=ExpenseDB;Persist Security Info=True;User ID=sa;Password=123;MultipleActiveResultSets=True")
+            : base("Data Source=DESKTOP-N4VHHO0;Initial Catalog=ExpenseDB;Persist Security Info=True;User ID=sa;Password=123;MultipleActiveResultSets=True")
         {
         }
 

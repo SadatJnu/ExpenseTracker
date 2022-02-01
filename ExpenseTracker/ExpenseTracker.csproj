@@ -22,12 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="RDLC\DailyExpenses.rdlc">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Logs\" />
   </ItemGroup>
 

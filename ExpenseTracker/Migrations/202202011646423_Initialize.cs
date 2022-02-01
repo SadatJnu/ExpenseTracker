@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Initialise : DbMigration
+    public partial class Initialize : DbMigration
     {
         public override void Up()
         {
@@ -35,14 +35,12 @@
                         REG_DATE = c.DateTime(),
                         UPD_DATE = c.DateTime(),
                     })
-                .PrimaryKey(t => t.Id)
-                .Index(t => t.CategoryName, unique: true);
+                .PrimaryKey(t => t.Id);
             
         }
         
         public override void Down()
         {
-            DropIndex("dbo.ExpenseCategories", new[] { "CategoryName" });
             DropTable("dbo.ExpenseCategories");
             DropTable("dbo.DailyExpenses");
         }
